@@ -25,16 +25,16 @@ XHTTP 默认有多路复用（XMUX），支持头部填充（header padding）�
           "host": "example.com",
           "path": "/yourpath",
           "mode": "auto",
+          "xPaddingBytes": "100-1000",
+          "xPaddingObfsMode": false,
+          "xPaddingKey": "",
+          "xPaddingHeader": "",
+          "xPaddingPlacement": "header",
+          "xPaddingMethod": "repeat-x",
           "extra": {
             "headers": {
               "key": "value"
             },
-            "xPaddingBytes": "100-1000",
-            "xPaddingObfsMode": false,
-            "xPaddingKey": "",
-            "xPaddingHeader": "",
-            "xPaddingPlacement": "header",
-            "xPaddingMethod": "repeat-x",
             "noGRPCHeader": false,
             "noSSEHeader": false,
             "scMaxEachPostBytes": 1000000,
@@ -98,26 +98,6 @@ HTTP 请求的路径前缀。客户端实际使用的路径由 Xray 内部自动
 `"stream-up"` 是例外，接受 `stream-one` 连接。若设为具体模式，则仅接受该模式。
 :::
 
-> `extra`: [ExtraObject](#extraobject)
-
-除 `host`、`path`、`mode` 以外的所有参数。当 `extra` 存在时，仅上述三项会从顶层读取，其余参数均从 `extra` 读取。
-
-## ExtraObject
-
-`ExtraObject` 包含 XHTTP 的增强功能配置。
-
-> `headers`: map \{string: string\}
-
-自定义 HTTP 头部，一个键值对。仅客户端。
-
-> `xPaddingBytes`: string | number
-
-请求头与响应头的 padding 长度，用于消除 HTTP 头部固定长度特征。
-
-可填固定值如 `100`，或范围如 `"100-1000"`（每次请求在该范围内随机）。默认值为 `"100-1000"`。
-
-当 `xPaddingObfsMode` 为 `false`（默认）时，客户端 padding 通过 `Referer` 头部实现（格式为 `Referer: ...?x_padding=XXX...`），服务端 padding 通过 `X-Padding` 响应头实现。
-
 > `xPaddingObfsMode`: true | false
 
 是否启用新的 padding 混淆模式。默认值为 `false`。
@@ -154,6 +134,26 @@ padding 的生成方式。默认值为 `"repeat-x"`。
 
 - `"repeat-x"` — 与旧版本一致，重复字符填充。
 - `"tokenish"` — 生成类似 token 的随机序列，利用 Huffman 编码压缩。base62 序列在 Huffman 编码下约有 20% 的大小缩减，生成时会根据此压缩比进行调整，直到达到验证容差（目前为 2 字节）。
+
+> `extra`: [ExtraObject](#extraobject)
+
+除 `host`、`path`、`mode` 以外的所有参数。当 `extra` 存在时，仅上述三项会从顶层读取，其余参数均从 `extra` 读取。
+
+## ExtraObject
+
+`ExtraObject` 包含 XHTTP 的增强功能配置。
+
+> `headers`: map \{string: string\}
+
+自定义 HTTP 头部，一个键值对。仅客户端。
+
+> `xPaddingBytes`: string | number
+
+请求头与响应头的 padding 长度，用于消除 HTTP 头部固定长度特征。
+
+可填固定值如 `100`，或范围如 `"100-1000"`（每次请求在该范围内随机）。默认值为 `"100-1000"`。
+
+当 `xPaddingObfsMode` 为 `false`（默认）时，客户端 padding 通过 `Referer` 头部实现（格式为 `Referer: ...?x_padding=XXX...`），服务端 padding 通过 `X-Padding` 响应头实现。
 
 > `noGRPCHeader`: true | false
 
